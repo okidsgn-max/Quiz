@@ -8,20 +8,28 @@
     
     <style>
         :root {
-            --bg-color: #0C0C0C;
-            --accent-color: #04C9B0;
+            --primary-green: #2BD4AD; /* Акцентный цвет */
+            --bg-dark: #000000;
             --text-color: #FFFFFF;
+            --glass-bg: rgba(20, 20, 20, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --item-bg: rgba(255, 255, 255, 0.03);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
             font-family: 'Open Sans', 'SB Sans', Arial, sans-serif;
-            background-color: var(--bg-color);
+            background-color: var(--bg-dark);
+            /* Градиент как в основном квизе */
+            background: radial-gradient(circle at 50% -10%, #1a5548 0%, #000000 60%);
             color: var(--text-color);
-            margin: 0;
-            padding: 0;
             height: 100vh;
             overflow: hidden;
-            background: radial-gradient(circle at top right, #1a2a3a 0%, #000000 100%);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -30,141 +38,173 @@
         /* Основная сетка */
         .main-grid {
             display: grid;
-            grid-template-columns: 1fr 1.4fr; /* Левая часть чуть уже, правая шире */
+            grid-template-columns: 1fr 1.6fr; /* Левая колонка уже, правая шире */
             width: 100%;
             height: 100vh;
             max-width: 1920px;
-            gap: 60px;
+            gap: 40px;
             padding: 40px 60px;
-            box-sizing: border-box;
+        }
+
+        /* --- ОБЩИЕ СТИЛИ ПАНЕЛЕЙ (СТЕКЛО) --- */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         /* --- ЛЕВАЯ КОЛОНКА --- */
         .left-panel {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between; /* Распределяем элементы по высоте */
+            @extend .glass-panel; /* Используем тот же стиль */
+            background: transparent; /* У левой панели уберем фон, оставим элементы */
+            border: none;
+            box-shadow: none;
+            backdrop-filter: none;
+            
+            justify-content: space-between;
             align-items: center;
             text-align: center;
             padding: 20px 0;
-            height: 100%;
+        }
+
+        .cta-block {
+            margin-bottom: 20px;
         }
 
         .cta-header {
-            font-size: 36pt;
+            font-size: 42px;
             font-weight: 800;
-            line-height: 1.2;
-            text-transform: uppercase;
-            background: linear-gradient(90deg, #FFFFFF, #BFBFBF);
+            line-height: 1.1;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 20px;
-            text-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
 
         .cta-subtext {
-            font-size: 18pt;
-            color: var(--accent-color);
+            font-size: 20px;
+            color: var(--primary-green);
             font-weight: 600;
-            margin-top: -10px;
-            margin-bottom: 20px;
+            opacity: 0.9;
         }
 
         /* Контейнер QR кода */
         .qr-container {
-            flex-grow: 1; /* Занимает доступное пространство */
+            flex-grow: 1;
             display: flex;
             justify-content: center;
             align-items: center;
             width: 100%;
-            max-height: 50vh; /* Ограничение высоты */
             margin: 20px 0;
+            position: relative;
+        }
+
+        .qr-frame {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
         }
 
         .qr-code {
-            height: 100%;
-            width: auto;
-            max-width: 100%;
-            border-radius: 24px;
-            border: 8px solid white; /* Белая рамка для контраста */
-            box-shadow: 0 0 50px rgba(4, 201, 176, 0.2);
+            width: 320px; /* Размер QR */
+            height: 320px;
+            border-radius: 12px;
             object-fit: contain;
-            background: white; /* Фон на случай прозрачного PNG */
+            display: block;
         }
 
-        /* Заглушка для QR, если картинки нет */
+        /* Заглушка */
         .qr-placeholder {
-            width: 350px;
-            height: 350px;
+            width: 320px;
+            height: 320px;
             background: white;
-            border-radius: 24px;
+            border-radius: 12px;
             display: flex;
             justify-content: center;
             align-items: center;
-            color: black;
-            font-weight: bold;
-            font-size: 24pt;
+            color: #1a5548;
+            font-weight: 700;
+            font-size: 24px;
         }
 
-        /* Блок таймера внизу */
+        /* Блок таймера */
         .timer-block {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 32px;
-            padding: 20px 40px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 25px 40px;
             width: 100%;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            backdrop-filter: blur(20px);
         }
 
         .timer-label {
-            font-size: 14pt;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            font-size: 16px;
+            color: #aaa;
             margin-bottom: 5px;
+            font-weight: 600;
         }
 
         .timer-value {
-            font-size: 80pt;
-            font-weight: 800;
-            color: var(--accent-color);
+            font-size: 72px;
+            font-weight: 700;
+            color: var(--primary-green);
             font-variant-numeric: tabular-nums;
             line-height: 1;
-            text-shadow: 0 0 30px rgba(4, 201, 176, 0.4);
+            text-shadow: 0 0 30px rgba(43, 212, 173, 0.2);
         }
 
         /* --- ПРАВАЯ КОЛОНКА (ТАБЛИЦА) --- */
         .right-panel {
-            background-color: rgba(26, 26, 26, 0.85);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
             border-radius: 32px;
             padding: 40px;
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
             display: flex;
             flex-direction: column;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.05);
         }
 
         h2 {
-            font-size: 32pt;
+            font-size: 32px;
             font-weight: 700;
-            margin: 0 0 20px 0;
-            color: var(--accent-color);
-            border-bottom: 2px solid rgba(255,255,255,0.1);
-            padding-bottom: 20px;
+            margin: 0 0 25px 0;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        h2::before {
+            content: '';
+            display: block;
+            width: 6px;
+            height: 32px;
+            background: var(--primary-green);
+            border-radius: 3px;
+            box-shadow: 0 0 15px var(--primary-green);
         }
 
+        /* Заголовки таблицы */
         .table-header {
             display: grid;
-            grid-template-columns: 80px 1fr 180px 120px; /* # | Имя | Тел | Очки */
+            grid-template-columns: 70px 1fr 180px 120px; /* # | Имя | Тел | Очки */
             padding: 0 20px 15px 20px;
-            color: #BFBFBF;
+            color: #888;
             font-weight: 600;
-            font-size: 16pt;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            font-size: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 10px;
         }
 
         #leaderboard-list {
@@ -173,46 +213,97 @@
             padding-right: 10px;
         }
 
-        #leaderboard-list::-webkit-scrollbar { width: 8px; }
-        #leaderboard-list::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 4px; }
-        #leaderboard-list::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 4px; }
+        /* Скроллбар */
+        #leaderboard-list::-webkit-scrollbar { width: 6px; }
+        #leaderboard-list::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 3px; }
+        #leaderboard-list::-webkit-scrollbar-thumb { background: var(--primary-green); border-radius: 3px; }
 
+        /* Элемент списка */
         .leader-item {
             display: grid;
-            grid-template-columns: 80px 1fr 180px 120px;
-            padding: 15px 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            grid-template-columns: 70px 1fr 180px 120px;
+            padding: 18px 20px;
             align-items: center;
-            font-size: 18pt;
-            animation: slideIn 0.5s ease;
+            font-size: 18px;
+            animation: slideIn 0.4s ease;
             margin-bottom: 8px;
-            border-radius: 12px;
-            background: rgba(255,255,255,0.02);
+            border-radius: 16px;
+            background: var(--item-bg);
+            border: 1px solid transparent;
+            transition: transform 0.2s;
         }
 
-        .leader-item:nth-child(1) { background: linear-gradient(90deg, rgba(255, 215, 0, 0.2), transparent); border-left: 4px solid gold; }
-        .leader-item:nth-child(2) { background: linear-gradient(90deg, rgba(192, 192, 192, 0.2), transparent); border-left: 4px solid silver; }
-        .leader-item:nth-child(3) { background: linear-gradient(90deg, rgba(205, 127, 50, 0.2), transparent); border-left: 4px solid #cd7f32; }
+        .leader-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
 
-        .rank { color: #888; font-weight: bold; }
-        .score { color: var(--accent-color); font-weight: 800; text-align: right; }
-        .phone { color: #888; font-family: monospace; font-size: 16pt; letter-spacing: 1px; }
+        /* Топ 3 */
+        .leader-item:nth-child(1) { 
+            background: linear-gradient(90deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05)); 
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        .leader-item:nth-child(2) { 
+            background: linear-gradient(90deg, rgba(192, 192, 192, 0.15), rgba(192, 192, 192, 0.05)); 
+            border: 1px solid rgba(192, 192, 192, 0.3);
+        }
+        .leader-item:nth-child(3) { 
+            background: linear-gradient(90deg, rgba(205, 127, 50, 0.15), rgba(205, 127, 50, 0.05)); 
+            border: 1px solid rgba(205, 127, 50, 0.3);
+        }
+
+        .rank { 
+            color: #666; 
+            font-weight: 700; 
+            font-size: 16px;
+        }
+        
+        /* Особый стиль для номера места в топ-3 */
+        .leader-item:nth-child(1) .rank { color: #FFD700; }
+        .leader-item:nth-child(2) .rank { color: #C0C0C0; }
+        .leader-item:nth-child(3) .rank { color: #CD7F32; }
+
+        .score { 
+            color: var(--primary-green); 
+            font-weight: 700; 
+            text-align: right; 
+            font-size: 20px;
+        }
+        
+        .phone { 
+            color: #888; 
+            font-family: monospace; 
+            font-size: 16px; 
+            text-align: right;
+        }
         
         .name-cell {
             display: flex;
-            flex-direction: column;
-            justify-content: center;
+            align-items: center;
         }
+        
         .name-text {
             font-weight: 600;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            color: #eee;
         }
 
         @keyframes slideIn {
-            from { opacity: 0; transform: translateX(20px); }
+            from { opacity: 0; transform: translateX(10px); }
             to { opacity: 1; transform: translateX(0); }
+        }
+        
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+                height: auto;
+                overflow-y: auto;
+            }
+            body { overflow: auto; }
+            .left-panel, .right-panel { width: 100%; margin-bottom: 20px; }
+            .qr-code { width: 200px; height: 200px; }
+            .qr-placeholder { width: 200px; height: 200px; }
         }
     </style>
 </head>
@@ -223,31 +314,27 @@
         <!-- ЛЕВАЯ КОЛОНКА -->
         <div class="left-panel">
             
-            <!-- 1. Текст вверху -->
-            <div>
+            <div class="cta-block">
                 <div class="cta-header">
                     Участвуй в квизе<br>и выигрывай!
                 </div>
-                <div class="cta-subtext">Сканируй QR-код</div>
+                <div class="cta-subtext">Сканируй QR-код для регистрации</div>
             </div>
 
-            <!-- 2. Большой QR код по центру -->
             <div class="qr-container">
-                <!-- ЗАМЕНИТЕ src="qr.png" НА ВАШ ФАЙЛ С QR КОДОМ -->
-                <img src="qr.png" alt="QR Code" class="qr-code" onerror="this.style.display='none'; document.getElementById('qr-stub').style.display='flex'">
-                
-                <!-- Заглушка, если картинки нет -->
-                <div id="qr-stub" class="qr-placeholder" style="display:none;">
-                    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 3h18v18H3zM7 7h3v3H7zm7 0h3v3h-3zm0 7h3v3h-3zM7 14h3v3H7z"/>
-                    </svg>
-                    <span style="font-size: 20px; margin-left: 10px;">QR CODE</span>
+                <div class="qr-frame">
+                    <!-- ЗАМЕНИТЕ src="qr.png" НА ВАШ ФАЙЛ -->
+                    <img src="qr.png" alt="QR Code" class="qr-code" onerror="this.style.display='none'; document.getElementById('qr-stub').style.display='flex'">
+                    
+                    <!-- Заглушка -->
+                    <div id="qr-stub" class="qr-placeholder" style="display:none;">
+                        QR CODE
+                    </div>
                 </div>
             </div>
 
-            <!-- 3. Таймер внизу -->
             <div class="timer-block">
-                <div class="timer-label">До конца</div>
+                <div class="timer-label">До окончания приема ответов</div>
                 <div class="timer-value" id="countdown">02:00</div>
             </div>
 
@@ -260,12 +347,12 @@
             <div class="table-header">
                 <div>#</div>
                 <div>Игрок</div>
-                <div style="text-align: right;">Тел.</div>
+                <div style="text-align: right;">Телефон</div>
                 <div style="text-align: right;">Очки</div>
             </div>
 
             <div id="leaderboard-list">
-                <div style="text-align: center; padding: 60px; color: #666; font-size: 18pt;">Подключение к базе данных...</div>
+                <div style="text-align: center; padding: 60px; color: #666; font-size: 18px;">Подключение к базе данных...</div>
             </div>
         </div>
 
@@ -277,6 +364,7 @@
         import { getFirestore, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
+        // КОНФИГУРАЦИЯ FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyAtWYGQrIflUSIRBo7tVum5Mb0GNUFjMQU",
             authDomain: "musicquizrating.firebaseapp.com",
@@ -288,7 +376,9 @@
             measurementId: "G-QBEED7WV9Z"
         };
 
-        // --- ЛОГИКА ТАЙМЕРА (2 минуты) ---
+        // --- ТАЙМЕР (2 минуты) ---
+        // Примечание: Для реального события лучше задать фиксированную дату, например:
+        // const targetDate = new Date("2023-12-31T20:00:00");
         const targetDate = new Date();
         targetDate.setMinutes(targetDate.getMinutes() + 2); 
 
@@ -332,16 +422,14 @@
                 listContainer.innerHTML = '';
                 
                 if (snapshot.empty) {
-                    listContainer.innerHTML = '<div style="text-align: center; padding: 60px; color: #666; font-size: 18pt;">Пока нет результатов</div>';
+                    listContainer.innerHTML = '<div style="text-align: center; padding: 60px; color: #666; font-size: 18px;">Пока нет результатов</div>';
                     return;
                 }
 
                 let rank = 1;
                 snapshot.forEach((doc) => {
                     const data = doc.data();
-                    // --- ФИЛЬТРАЦИЯ ---
-                    // Показываем ТОЛЬКО если finished === true
-                    // Это позволяет отобразить игроков с 0 очков, если они завершили игру.
+                    // Фильтр: только если игра закончена (даже с 0 очков)
                     if (data.finished === true) {
                         renderRow(rank, data);
                         rank++;
@@ -356,16 +444,15 @@
             const div = document.createElement('div');
             div.className = 'leader-item';
             
-            // --- ЛОГИКА МАСКИ ТЕЛЕФОНА ---
-            // Оставляем только последние 4 цифры
+            // Маска телефона (последние 4 цифры)
             let maskedPhone = "";
             if (data.phone) {
                 const digitsOnly = data.phone.replace(/\D/g, ''); 
                 if (digitsOnly.length >= 4) {
                     const last4 = digitsOnly.slice(-4);
-                    maskedPhone = "*******" + last4;
+                    maskedPhone = "..." + last4; // Заменили звездочки на троеточие для чистоты
                 } else {
-                    maskedPhone = "****"; 
+                    maskedPhone = "..."; 
                 }
             }
 
@@ -374,7 +461,7 @@
                 <div class="name-cell">
                     <span class="name-text">${escapeHtml(data.name)}</span>
                 </div>
-                <div class="phone" style="text-align: right;">${maskedPhone}</div>
+                <div class="phone">${maskedPhone}</div>
                 <div class="score">${data.score}</div>
             `;
             listContainer.appendChild(div);
