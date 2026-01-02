@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Угадай мелодию</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Подключаем библиотеку для маски телефона -->
+    <script src="https://unpkg.com/imask"></script>
     
     <style>
         :root {
@@ -318,7 +320,8 @@
             </div>
             
             <div class="form-group">
-                <input type="tel" id="reg-phone" placeholder="Телефон" autocomplete="off">
+                <!-- Изменили placeholder, чтобы показать формат -->
+                <input type="tel" id="reg-phone" placeholder="+7 (___) ___-__-__" autocomplete="off">
             </div>
             
             <div class="form-group">
@@ -426,6 +429,15 @@
             if (startBtn) {
                 startBtn.addEventListener('click', submitRegistration);
             }
+
+            // --- Инициализация маски для телефона ---
+            const phoneElement = document.getElementById('reg-phone');
+            if (phoneElement && window.IMask) {
+                const maskOptions = {
+                    mask: '+{7} (000) 000-00-00'
+                };
+                window.IMask(phoneElement, maskOptions);
+            }
         });
 
         // ЛОГИКА
@@ -436,6 +448,12 @@
 
             if (!name || !phone) {
                 alert("Пожалуйста, заполните Имя и Телефон");
+                return;
+            }
+
+            // Простая проверка длины телефона (формат +7 (XXX) XXX-XX-XX = 18 символов)
+            if (phone.length < 18) {
+                alert("Пожалуйста, введите корректный номер телефона");
                 return;
             }
 
