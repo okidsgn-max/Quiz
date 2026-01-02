@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Угадай мелодию</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0C0C0C;
+            --accent-color: #04C9B0;
+            --accent-hover: #00B49D;
+            --text-color: #FFFFFF;
+            --text-secondary: #BFBFBF;
+            --surface-color: #2A2A2A;
+            --error-color: #980042;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', 'SB Sans', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at top right, #1a2a3a 0%, #000000 100%);
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        /* Контейнер приложения */
+        #app-container {
+            width: 100%;
+            max-width: 800px;
+            background-color: rgba(26, 26, 26, 0.95);
+            border-radius: 48px;
+            padding: 40px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Адаптивность для мобильных */
+        @media (max-width: 768px) {
+            #app-container {
+                padding: 20px;
+                border-radius: 24px;
+                min-height: 100vh;
+                margin: 0;
+            }
+        }
+
+        /* Экраны */
+        .screen {
+            display: none;
+            flex-direction: column;
+            flex-grow: 1;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Типографика */
+        h1 {
+            font-size: 32pt;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-color);
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 22pt;
+            font-weight: 600;
+            margin-bottom: 30px;
+            line-height: 1.3;
+        }
+
+        p {
+            font-size: 14pt;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        /* Формы */
+        .form-group {
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        input {
+            width: 100%;
+            background-color: var(--surface-color);
+            border: 2px solid transparent;
+            border-radius: 16px;
+            padding: 16px 20px;
+            font-size: 14pt;
+            color: var(--text-color);
+            font-family: inherit;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--accent-color);
+            background-color: #333;
+        }
+
+        input::placeholder {
+            color: #666;
+        }
+
+        /* Кнопки */
+        .primary-btn {
+            background-color: var(--accent-color);
+            color: #0C0C0C;
+            font-size: 16pt;
+            font-weight: 600;
+            border: none;
+            border-radius: 16px;
+            padding: 16px 30px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            margin-top: auto;
+            text-align: center;
+        }
+
+        .primary-btn:hover {
+            background-color: var(--accent-hover);
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(4, 201, 176, 0.3);
+        }
+
+        /* Элементы Квиза */
+        .progress-text {
+            font-size: 14pt;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .timer-container {
+            width: 100%;
+            background-color: #333;
+            height: 6px;
+            border-radius: 3px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .timer-bar {
+            height: 100%;
+            background-color: var(--accent-color);
+            width: 100%;
+            transition: width 1s linear;
+        }
+
+        .answers-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .answers-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .answer-btn {
+            background-color: var(--surface-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 16px;
+            padding: 20px;
+            font-size: 14pt;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            min-height: 80px;
+        }
+
+        .answer-btn:hover {
+            background-color: #3A3A3A;
+            transform: translateY(-2px);
+        }
+
+        .answer-btn.correct {
+            background-color: var(--accent-color);
+            color: #0C0C0C;
+        }
+
+        .answer-btn.wrong {
+            background-color: var(--error-color);
+        }
+
+        .score-display {
+            display: none; /* Скрываем счетчик для игрока во время игры */
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        
+        <!-- ЭКРАН 1: РЕГИСТРАЦИЯ -->
+        <div id="screen-register" class="screen active" style="justify-content: center;">
+            <h1>Угадай мелодию!</h1>
+            <p>Заполните форму, чтобы начать игру и зафиксировать результат.</p>
+            
+            <div class="form-group">
+                <input type="text" id="reg-name" placeholder="Ваше Имя" autocomplete="off">
+            </div>
+            
+            <div class="form-group">
+                <input type="tel" id="reg-phone" placeholder="Телефон" autocomplete="off">
+            </div>
+            
+            <div class="form-group">
+                <input type="text" id="reg-company" placeholder="Компания / Должность" autocomplete="off">
+            </div>
+
+            <button class="primary-btn" id="start-game-btn">Начать игру</button>
+            <div style="text-align: center; margin-top: 15px;">
+                <span style="color: #666; font-size: 10pt;">Нажимая кнопку, вы принимаете условия игры</span>
+            </div>
+        </div>
+
+        <!-- ЭКРАН 2: ИГРА -->
+        <div id="screen-game" class="screen">
+            <div class="progress-text">
+                <span id="question-counter">1/6</span>
+                <!-- Скрываем очки во время игры, если нужно, можно убрать style -->
+                <span id="score-display" style="opacity: 0;">Очки: 0</span>
+            </div>
+
+            <div class="timer-container">
+                <div id="timer-bar" class="timer-bar"></div>
+            </div>
+
+            <h2 id="question-text">Текст вопроса...</h2>
+            
+            <div id="answers-container" class="answers-grid">
+                <!-- Кнопки будут здесь -->
+            </div>
+        </div>
+
+        <!-- ЭКРАН 3: РЕЗУЛЬТАТ (ОБНОВЛЕННЫЙ) -->
+        <div id="screen-result" class="screen" style="text-align: center; align-items: center; justify-content: center;">
+            <div style="margin-bottom: 20px;">
+                <!-- Галочка или иконка успеха -->
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin: 0 auto; display: block;">
+                    <circle cx="12" cy="12" r="10" stroke="#04C9B0" stroke-width="2"/>
+                    <path d="M8 12L11 15L16 9" stroke="#04C9B0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            
+            <h2>Спасибо за игру!</h2>
+            <p>Ваши ответы приняты.</p>
+            <p style="font-size: 16pt; color: #FFFFFF; max-width: 600px;">
+                Результаты и турнирная таблица будут объявлены на финале.
+            </p>
+
+            <button class="primary-btn" onclick="location.reload()" style="margin-top: 40px;">В начало</button>
+        </div>
+
+    </div>
+
+    <!-- FIREBASE MODULE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        // КОНФИГУРАЦИЯ FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyAtWYGQrIflUSIRBo7tVum5Mb0GNUFjMQU",
+            authDomain: "musicquizrating.firebaseapp.com",
+            databaseURL: "https://musicquizrating-default-rtdb.firebaseio.com",
+            projectId: "musicquizrating",
+            storageBucket: "musicquizrating.firebasestorage.app",
+            messagingSenderId: "347621038586",
+            appId: "1:347621038586:web:463a2532317f44ea4c2c43",
+            measurementId: "G-QBEED7WV9Z"
+        };
+
+        // Инициализация
+        let app, db;
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            console.log("Firebase инициализирован");
+        } catch (error) {
+            console.error("Ошибка Firebase:", error);
+        }
+
+        // ДАННЫЕ ИГРЫ
+        const questions = [
+            {
+                text: "Какому бренду принадлежит данный джингл?",
+                options: ["Microsoft", "Apple", "Samsung", "Intel"],
+                correct: 3
+            },
+            {
+                text: "Немного ностальгии. Кому принадлежит данный джингл?",
+                options: ["Nokia", "Microsoft (win xp)", "Motorola", "Sony"],
+                correct: 0
+            },
+            {
+                text: "Какому бренду принадлежит данный джингл?",
+                options: ["МТС", "Мегафон", "Ростелеком", "Билайн"],
+                correct: 1
+            },
+            {
+                text: "Что говорит данный персонаж?",
+                options: ["Одна ошибка и ты…", "Нельзя просто взять и…", "Не важно, что ты падал…", "Нам нужно сфокусироваться…"],
+                correct: 1
+            },
+            {
+                text: "Какой бренд звучит как «Ta-dum»?",
+                options: ["HBO", "YouTube", "Netflix", "Marvel Studios"],
+                correct: 2
+            },
+            {
+                text: "Звук оплаты какого сервиса вы сейчас услышали?",
+                options: ["Visa", "Apple Pay", "Google Pay", "Master Card"],
+                correct: 2
+            }
+        ];
+
+        let state = {
+            name: "",
+            phone: "",
+            company: "",
+            score: 0,
+            currentQ: 0,
+            timer: null,
+            timeLeft: 15,
+            maxTime: 15
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const startBtn = document.getElementById('start-game-btn');
+            if (startBtn) {
+                startBtn.addEventListener('click', submitRegistration);
+            }
+        });
+
+        function submitRegistration() {
+            const name = document.getElementById('reg-name').value.trim();
+            const phone = document.getElementById('reg-phone').value.trim();
+            const company = document.getElementById('reg-company').value.trim();
+
+            if (!name || !phone) {
+                alert("Пожалуйста, заполните Имя и Телефон");
+                return;
+            }
+
+            state.name = name;
+            state.phone = phone;
+            state.company = company;
+
+            switchScreen('screen-game');
+            loadQuestion();
+        }
+
+        function switchScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function loadQuestion() {
+            if (state.currentQ >= questions.length) {
+                finishGame();
+                return;
+            }
+
+            clearInterval(state.timer);
+            state.timeLeft = state.maxTime;
+            updateTimerBar();
+
+            const q = questions[state.currentQ];
+            document.getElementById('question-text').innerText = q.text;
+            document.getElementById('question-counter').innerText = `${state.currentQ + 1}/${questions.length}`;
+
+            const container = document.getElementById('answers-container');
+            container.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.innerText = opt;
+                btn.onclick = () => selectAnswer(idx, btn);
+                container.appendChild(btn);
+            });
+
+            startTimer();
+        }
+
+        function startTimer() {
+            state.timer = setInterval(() => {
+                state.timeLeft--;
+                updateTimerBar();
+                if (state.timeLeft <= 0) {
+                    clearInterval(state.timer);
+                    handleTimeOut();
+                }
+            }, 1000);
+        }
+
+        function updateTimerBar() {
+            const pct = (state.timeLeft / state.maxTime) * 100;
+            const bar = document.getElementById('timer-bar');
+            bar.style.width = pct + '%';
+            if (pct < 30) bar.style.backgroundColor = 'var(--error-color)';
+            else bar.style.backgroundColor = 'var(--accent-color)';
+        }
+
+        function handleTimeOut() {
+            const q = questions[state.currentQ];
+            const buttons = document.querySelectorAll('.answer-btn');
+            buttons[q.correct].classList.add('correct');
+            disableButtons();
+            setTimeout(nextQuestion, 1500);
+        }
+
+        function selectAnswer(idx, btn) {
+            clearInterval(state.timer);
+            disableButtons();
+
+            const q = questions[state.currentQ];
+            const isCorrect = (idx === q.correct);
+
+            if (isCorrect) {
+                btn.classList.add('correct');
+                state.score += 100 + (state.timeLeft * 10);
+            } else {
+                btn.classList.add('wrong');
+                document.querySelectorAll('.answer-btn')[q.correct].classList.add('correct');
+            }
+
+            // Счетчик очков скрыт для игрока, но мы обновляем его в фоне
+            document.getElementById('score-display').innerText = `Очки: ${state.score}`;
+            setTimeout(nextQuestion, 1500);
+        }
+
+        function disableButtons() {
+            document.querySelectorAll('.answer-btn').forEach(b => b.disabled = true);
+        }
+
+        function nextQuestion() {
+            state.currentQ++;
+            loadQuestion();
+        }
+
+        async function finishGame() {
+            switchScreen('screen-result');
+            // Здесь мы больше не показываем очки и топ
+            await saveResult();
+        }
+
+        async function saveResult() {
+            if (!db) return;
+            try {
+                await addDoc(collection(db, "quiz_leads"), {
+                    name: state.name,
+                    phone: state.phone,
+                    company: state.company,
+                    score: state.score,
+                    date: new Date()
+                });
+                console.log("Result saved");
+            } catch (e) {
+                console.error("Error saving:", e);
+            }
+        }
+    </script>
+</body>
+</html>
