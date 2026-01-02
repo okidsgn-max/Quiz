@@ -291,6 +291,69 @@
             color: #666; 
             text-align: center; 
             margin-top: 15px;
+            line-height: 1.4;
+        }
+
+        /* --- ПОПАП (Всплывающее окно) --- */
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75); /* Затемнение фона */
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .popup-overlay.active {
+            display: flex;
+        }
+
+        .popup-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 30px;
+            max-width: 90%;
+            width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .popup-content p {
+            font-size: 18px;
+            color: white;
+            margin-bottom: 25px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .popup-close-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 0;
+            width: auto;
+            min-width: 120px;
+            box-shadow: none;
+        }
+        
+        .popup-close-btn:hover {
+            background: var(--primary-green);
+            color: black;
         }
 
     </style>
@@ -330,7 +393,7 @@
 
             <button class="primary-btn" id="start-game-btn">Начать игру</button>
             <div class="legal-text">
-                Нажимая кнопку, вы принимаете условия обработки данных
+                Нажимая «Начать игру», вы соглашаетесь на условия игры и передачу персональных данных
             </div>
         </div>
 
@@ -371,6 +434,14 @@
             <button class="primary-btn" onclick="location.reload()" style="margin-top: 20px;">В начало</button>
         </div>
 
+    </div>
+
+    <!-- ПОПАП ВАЛИДАЦИИ -->
+    <div id="validation-popup" class="popup-overlay">
+        <div class="popup-content">
+            <p>Заполните поля формы, чтобы начать прохождение квиза, и возможно выиграть призы</p>
+            <button class="popup-close-btn" id="popup-close-btn">Закрыть</button>
+        </div>
     </div>
 
     <!-- FIREBASE MODULE -->
@@ -430,6 +501,23 @@
                 startBtn.addEventListener('click', submitRegistration);
             }
 
+            // Обработчик закрытия попапа
+            const popupCloseBtn = document.getElementById('popup-close-btn');
+            const popupOverlay = document.getElementById('validation-popup');
+            if (popupCloseBtn) {
+                popupCloseBtn.addEventListener('click', () => {
+                    popupOverlay.classList.remove('active');
+                });
+            }
+            // Закрытие при клике вне окна
+            if (popupOverlay) {
+                popupOverlay.addEventListener('click', (e) => {
+                    if (e.target === popupOverlay) {
+                        popupOverlay.classList.remove('active');
+                    }
+                });
+            }
+
             // --- Инициализация маски для телефона ---
             const phoneElement = document.getElementById('reg-phone');
             if (phoneElement && window.IMask) {
@@ -446,8 +534,11 @@
             const phone = document.getElementById('reg-phone').value.trim();
             const company = document.getElementById('reg-company').value.trim();
 
+            // Проверка на заполненность
             if (!name || !phone) {
-                alert("Пожалуйста, заполните Имя и Телефон");
+                // Вместо alert показываем попап
+                const popup = document.getElementById('validation-popup');
+                if (popup) popup.classList.add('active');
                 return;
             }
 
