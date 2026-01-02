@@ -2,454 +2,358 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Угадай мелодию</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Турнирная таблица - Финал</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <!-- Подключаем библиотеку для маски телефона -->
-    <script src="https://unpkg.com/imask"></script>
     
     <style>
         :root {
-            --primary-green: #2BD4AD; /* Ваш акцентный цвет */
+            --primary-green: #2BD4AD; /* Акцентный цвет */
             --bg-dark: #000000;
             --text-color: #FFFFFF;
             --glass-bg: rgba(20, 20, 20, 0.65);
             --glass-border: rgba(255, 255, 255, 0.08);
-            --input-bg: rgba(255, 255, 255, 0.1);
+            --item-bg: rgba(255, 255, 255, 0.03);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             font-family: 'Open Sans', 'SB Sans', Arial, sans-serif;
             background-color: var(--bg-dark);
-            /* Градиентный фон: черный с зеленым свечением сверху */
             background: radial-gradient(circle at 50% -10%, #1a5548 0%, #000000 60%);
-            background-attachment: fixed;
             color: var(--text-color);
-            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            overflow-x: hidden;
         }
 
-        /* --- ВЕРХНЕЕ МЕНЮ --- */
-        .top-nav {
+        /* --- ОСНОВНАЯ СЕТКА --- */
+        /* Слева (Таймер/QR) | Справа (Таблица) */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.6fr; 
             width: 100%;
-            padding: 20px 24px;
+            height: 100vh;
+            max-width: 1920px;
+            gap: 40px;
+            padding: 40px 60px;
+        }
+
+        /* --- ЛЕВАЯ КОЛОНКА --- */
+        .left-panel {
             display: flex;
+            flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 10;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-        }
-        
-        .logo img {
-            max-height: 40px; /* Высота логотипа */
-            width: auto;
-        }
-
-        .nav-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .nav-btn:hover {
-            background: var(--primary-green);
-            color: black;
-            border-color: var(--primary-green);
-        }
-
-        /* --- ГЛАВНЫЙ КОНТЕЙНЕР (СТЕКЛО) --- */
-        #app-container {
-            width: 100%;
-            max-width: 600px;
-            margin-top: 80px; /* Отступ под меню */
-            margin-bottom: 40px;
-            padding: 40px;
-            
-            /* Стили стекла */
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 32px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            min-height: 500px;
-        }
-
-        /* Адаптив для мобильных */
-        @media (max-width: 600px) {
-            #app-container {
-                margin-top: 70px;
-                width: 92%;
-                padding: 24px;
-                border-radius: 24px;
-                min-height: auto;
-            }
-            
-            h1 { font-size: 24pt !important; }
-            h2 { font-size: 18pt !important; }
-            .timer-container { margin-bottom: 20px !important; }
-        }
-
-        /* --- АНИМАЦИИ ЭКРАНОВ --- */
-        .screen {
-            display: none;
-            flex-direction: column;
-            flex-grow: 1;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .screen.active {
-            display: flex;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* --- ТИПОГРАФИКА --- */
-        h1 {
-            font-size: 32pt;
-            font-weight: 800;
-            margin-bottom: 16px;
             text-align: center;
+            padding: 20px 0;
+            /* Сама панель прозрачная, блоки внутри (QR, Таймер) - стекло */
+        }
+
+        .cta-block {
+            margin-bottom: 20px;
+        }
+
+        .cta-header {
+            font-size: 42px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 10px;
             background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        h2 {
-            font-size: 20pt;
-            font-weight: 700;
-            margin-bottom: 24px;
-            line-height: 1.3;
-        }
-
-        p {
-            font-size: 14px;
-            color: #ccc;
-            margin-bottom: 30px;
-            text-align: center;
-            line-height: 1.6;
-        }
-
-        /* --- ФОРМЫ --- */
-        .form-group {
-            margin-bottom: 16px;
-            width: 100%;
-        }
-
-        input {
-            width: 100%;
-            background-color: var(--input-bg);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 16px 20px;
-            font-size: 16px;
-            color: white;
-            font-family: inherit;
-            outline: none;
-            transition: all 0.3s;
-        }
-
-        input:focus {
-            border-color: var(--primary-green);
-            background-color: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 0 15px rgba(43, 212, 173, 0.2);
-        }
-
-        input::placeholder {
-            color: #888;
-        }
-
-        /* --- КНОПКИ --- */
-        .primary-btn {
-            background: var(--primary-green); /* Градиент или сплошной цвет */
-            background: linear-gradient(90deg, #2BD4AD 0%, #20a385 100%);
-            color: #000;
-            font-size: 18px;
-            font-weight: 700;
-            border: none;
-            border-radius: 16px;
-            padding: 18px;
-            cursor: pointer;
-            width: 100%;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin-top: auto;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(43, 212, 173, 0.3);
-        }
-
-        .primary-btn:active {
-            transform: scale(0.98);
-        }
-
-        /* --- ИГРОВОЙ ИНТЕРФЕЙС --- */
-        .progress-bar-wrapper {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 12px;
-            font-weight: 600;
+        .cta-subtext {
+            font-size: 20px;
             color: var(--primary-green);
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        /* Контейнер QR кода */
+        .qr-container {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .qr-frame {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .qr-code {
+            width: 300px; /* Оптимальный размер */
+            height: 300px;
+            border-radius: 12px;
+            object-fit: contain;
+            display: block;
+            background: white; /* Фон для прозрачных QR */
+        }
+
+        /* Заглушка, если нет картинки */
+        .qr-placeholder {
+            width: 300px;
+            height: 300px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #1a5548;
+            font-weight: 700;
+            font-size: 24px;
+        }
+
+        /* Блок таймера */
+        .timer-block {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 25px 40px;
+            width: 100%;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+        }
+
+        .timer-label {
+            font-size: 16px;
+            color: #aaa;
+            margin-bottom: 5px;
+            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
-        .timer-container {
-            width: 100%;
-            background-color: rgba(255,255,255,0.1);
-            height: 4px;
-            border-radius: 2px;
-            margin-bottom: 30px;
-            overflow: hidden;
-        }
-
-        .timer-bar {
-            height: 100%;
-            background-color: var(--primary-green);
-            width: 100%;
-            transition: width 1s linear;
-            box-shadow: 0 0 10px var(--primary-green);
-        }
-
-        .answers-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 12px;
-            width: 100%;
-        }
-
-        .answer-btn {
-            background-color: rgba(255,255,255,0.05);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 14px;
-            padding: 16px 20px;
-            font-size: 16px;
-            font-weight: 500;
-            text-align: left;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            min-height: 60px;
-        }
-
-        .answer-btn:hover {
-            background-color: rgba(255,255,255,0.1);
-            border-color: rgba(255,255,255,0.3);
-        }
-
-        .answer-btn:active {
-            transform: scale(0.99);
-        }
-
-        .answer-btn.correct {
-            background-color: var(--primary-green) !important;
-            color: #000 !important;
-            border-color: var(--primary-green) !important;
+        .timer-value {
+            font-size: 72px;
             font-weight: 700;
+            color: var(--primary-green);
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+            text-shadow: 0 0 30px rgba(43, 212, 173, 0.2);
         }
 
-        .answer-btn.wrong {
-            background-color: #ff4757 !important;
-            border-color: #ff4757 !important;
-        }
-        
-        .legal-text {
-            font-size: 10px; 
-            color: #666; 
-            text-align: center; 
-            margin-top: 15px;
-            line-height: 1.4;
-        }
-
-        /* --- ПОПАП (Всплывающее окно) --- */
-        .popup-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.75); /* Затемнение фона */
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            animation: fadeIn 0.3s ease;
-            backdrop-filter: blur(5px);
-        }
-
-        .popup-overlay.active {
-            display: flex;
-        }
-
-        .popup-content {
+        /* --- ПРАВАЯ КОЛОНКА (ТАБЛИЦА) --- */
+        .right-panel {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 30px;
-            max-width: 90%;
-            width: 400px;
-            text-align: center;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            border-radius: 32px;
+            padding: 40px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
-        .popup-content p {
-            font-size: 18px;
+        h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 0 0 25px 0;
             color: white;
-            margin-bottom: 25px;
-            font-weight: 600;
-            line-height: 1.4;
-        }
-
-        .popup-close-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 16px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 0;
-            width: auto;
-            min-width: 120px;
-            box-shadow: none;
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
         
-        .popup-close-btn:hover {
+        h2::before {
+            content: '';
+            display: block;
+            width: 6px;
+            height: 32px;
             background: var(--primary-green);
-            color: black;
+            border-radius: 3px;
+            box-shadow: 0 0 15px var(--primary-green);
         }
 
+        /* Шапка таблицы */
+        .table-header {
+            display: grid;
+            grid-template-columns: 70px 1fr 180px 120px; /* # | Имя | Тел | Очки */
+            padding: 0 20px 15px 20px;
+            color: #888;
+            font-weight: 600;
+            font-size: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 10px;
+        }
+
+        #leaderboard-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        /* Скроллбар */
+        #leaderboard-list::-webkit-scrollbar { width: 6px; }
+        #leaderboard-list::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 3px; }
+        #leaderboard-list::-webkit-scrollbar-thumb { background: var(--primary-green); border-radius: 3px; }
+
+        /* Строка участника */
+        .leader-item {
+            display: grid;
+            grid-template-columns: 70px 1fr 180px 120px;
+            padding: 18px 20px;
+            align-items: center;
+            font-size: 18px;
+            animation: slideIn 0.4s ease;
+            margin-bottom: 8px;
+            border-radius: 16px;
+            background: var(--item-bg);
+            border: 1px solid transparent;
+            transition: transform 0.2s;
+        }
+
+        .leader-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        /* Стиль Топ-3 */
+        .leader-item:nth-child(1) { 
+            background: linear-gradient(90deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05)); 
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        .leader-item:nth-child(2) { 
+            background: linear-gradient(90deg, rgba(192, 192, 192, 0.15), rgba(192, 192, 192, 0.05)); 
+            border: 1px solid rgba(192, 192, 192, 0.3);
+        }
+        .leader-item:nth-child(3) { 
+            background: linear-gradient(90deg, rgba(205, 127, 50, 0.15), rgba(205, 127, 50, 0.05)); 
+            border: 1px solid rgba(205, 127, 50, 0.3);
+        }
+
+        .rank { 
+            color: #666; 
+            font-weight: 700; 
+            font-size: 16px;
+        }
+        .leader-item:nth-child(1) .rank { color: #FFD700; }
+        .leader-item:nth-child(2) .rank { color: #C0C0C0; }
+        .leader-item:nth-child(3) .rank { color: #CD7F32; }
+
+        .score { 
+            color: var(--primary-green); 
+            font-weight: 700; 
+            text-align: right; 
+            font-size: 20px;
+        }
+        
+        .phone { 
+            color: #888; 
+            font-family: monospace; 
+            font-size: 16px; 
+            text-align: right;
+        }
+        
+        .name-cell {
+            display: flex;
+            align-items: center;
+        }
+        
+        .name-text {
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #eee;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        /* Адаптив: только на экранах уже 900px переключаемся в столбик */
+        @media (max-width: 900px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+                height: auto;
+                overflow-y: auto;
+                padding: 20px;
+            }
+            body { overflow: auto; }
+            .left-panel, .right-panel { width: 100%; margin-bottom: 20px; }
+            .qr-code { width: 200px; height: 200px; }
+            .qr-placeholder { width: 200px; height: 200px; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- ВЕРХНЕЕ МЕНЮ -->
-    <nav class="top-nav">
-        <div class="logo">
-            <!-- Логотип картинкой -->
-            <img src="logo.svg" alt="MusicQuiz Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-            <span style="display:none; font-weight:800; text-transform:uppercase;">MusicQuiz</span>
-        </div>
-        <a href="#" class="nav-btn" onclick="location.reload()">Попробовать</a>
-    </nav>
-
-    <!-- ОСНОВНОЙ КОНТЕЙНЕР -->
-    <div id="app-container">
+    <div class="main-grid">
         
-        <!-- ЭКРАН 1: РЕГИСТРАЦИЯ -->
-        <div id="screen-register" class="screen active" style="justify-content: center;">
-            <h1>Угадай мелодию</h1>
-            <p>Пройди музыкальный квиз, чтобы попасть в таблицу лидеров и выиграть призы!</p>
+        <!-- ЛЕВАЯ КОЛОНКА -->
+        <div class="left-panel">
             
-            <div class="form-group">
-                <input type="text" id="reg-name" placeholder="Ваше Имя" autocomplete="off">
-            </div>
-            
-            <div class="form-group">
-                <!-- Изменили placeholder, чтобы показать формат -->
-                <input type="tel" id="reg-phone" placeholder="+7 (___) ___-__-__" autocomplete="off">
-            </div>
-            
-            <div class="form-group">
-                <input type="text" id="reg-company" placeholder="Компания / Должность" autocomplete="off">
+            <div class="cta-block">
+                <div class="cta-header">
+                    Участвуй в квизе<br>и выигрывай!
+                </div>
+                <div class="cta-subtext">Сканируй QR-код для регистрации</div>
             </div>
 
-            <button class="primary-btn" id="start-game-btn">Начать игру</button>
-            <div class="legal-text">
-                Нажимая «Начать игру», вы соглашаетесь на условия игры и передачу персональных данных
+            <div class="qr-container">
+                <div class="qr-frame">
+                    <!-- QR КОД (qr.png) -->
+                    <img src="qr.png" alt="QR Code" class="qr-code" onerror="this.style.display='none'; document.getElementById('qr-stub').style.display='flex'">
+                    
+                    <!-- Заглушка -->
+                    <div id="qr-stub" class="qr-placeholder" style="display:none;">
+                        QR CODE
+                    </div>
+                </div>
             </div>
+
+            <div class="timer-block">
+                <div class="timer-label">До окончания приема ответов</div>
+                <div class="timer-value" id="countdown">02:00</div>
+            </div>
+
         </div>
 
-        <!-- ЭКРАН 2: ИГРА -->
-        <div id="screen-game" class="screen">
-            <div class="progress-bar-wrapper">
-                <span id="question-counter">ВОПРОС 1/6</span>
-                <span id="score-display" style="opacity: 0;">0</span>
-            </div>
-
-            <div class="timer-container">
-                <div id="timer-bar" class="timer-bar"></div>
-            </div>
-
-            <h2 id="question-text">Текст вопроса...</h2>
+        <!-- ПРАВАЯ КОЛОНКА -->
+        <div class="right-panel">
+            <h2>Топ участников</h2>
             
-            <div id="answers-container" class="answers-grid">
-                <!-- Кнопки будут здесь -->
+            <div class="table-header">
+                <div>#</div>
+                <div>Игрок</div>
+                <div style="text-align: right;">Телефон</div>
+                <div style="text-align: right;">Очки</div>
             </div>
-        </div>
 
-        <!-- ЭКРАН 3: РЕЗУЛЬТАТ -->
-        <div id="screen-result" class="screen" style="text-align: center; align-items: center; justify-content: center;">
-            <div style="margin-bottom: 30px;">
-                <!-- Галочка успеха -->
-                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin: 0 auto; display: block;">
-                    <circle cx="12" cy="12" r="10" stroke="#2BD4AD" stroke-width="2"/>
-                    <path d="M8 12L11 15L16 9" stroke="#2BD4AD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+            <div id="leaderboard-list">
+                <div style="text-align: center; padding: 60px; color: #666; font-size: 18px;">Подключение к базе данных...</div>
             </div>
-            
-            <h2>Спасибо за игру!</h2>
-            <p style="font-size: 16px; color: #fff;">Ваши ответы успешно приняты.</p>
-            <p style="max-width: 400px; margin-top: 10px;">
-                Результаты и турнирная таблица будут объявлены на финале. Следите за экраном!
-            </p>
-
-            <button class="primary-btn" onclick="location.reload()" style="margin-top: 20px;">В начало</button>
         </div>
 
     </div>
 
-    <!-- ПОПАП ВАЛИДАЦИИ -->
-    <div id="validation-popup" class="popup-overlay">
-        <div class="popup-content">
-            <p>Заполните поля формы, чтобы начать прохождение квиза, и возможно выиграть призы</p>
-            <button class="popup-close-btn" id="popup-close-btn">Закрыть</button>
-        </div>
-    </div>
-
-    <!-- FIREBASE MODULE -->
+    <!-- СКРИПТЫ -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getFirestore, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
-        // КОНФИГУРАЦИЯ FIREBASE (ВАША)
+        // КОНФИГУРАЦИЯ FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyAtWYGQrIflUSIRBo7tVum5Mb0GNUFjMQU",
             authDomain: "musicquizrating.firebaseapp.com",
@@ -461,235 +365,103 @@
             measurementId: "G-QBEED7WV9Z"
         };
 
-        // Инициализация
-        let app, db;
-        try {
-            app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            console.log("Firebase инициализирован");
-        } catch (error) {
-            console.error("Ошибка Firebase:", error);
-        }
+        // --- ТАЙМЕР (2 минуты) ---
+        const targetDate = new Date();
+        targetDate.setMinutes(targetDate.getMinutes() + 2); 
 
-        // ДАННЫЕ ВОПРОСОВ
-        const questions = [
-            { text: "Какому бренду принадлежит данный джингл?", options: ["Microsoft", "Apple", "Samsung", "Intel"], correct: 3 },
-            { text: "Немного ностальгии. Кому принадлежит данный джингл?", options: ["Nokia", "Microsoft (win xp)", "Motorola", "Sony"], correct: 0 },
-            { text: "Какому бренду принадлежит данный джингл?", options: ["МТС", "Мегафон", "Ростелеком", "Билайн"], correct: 1 },
-            { text: "Что говорит данный персонаж?", options: ["Одна ошибка и ты…", "Нельзя просто взять и…", "Не важно, что ты падал…", "Нам нужно сфокусироваться…"], correct: 1 },
-            { text: "Какой бренд звучит как «Ta-dum»?", options: ["HBO", "YouTube", "Netflix", "Marvel Studios"], correct: 2 },
-            { text: "Звук оплаты какого сервиса вы сейчас услышали?", options: ["Visa", "Apple Pay", "Google Pay", "Master Card"], correct: 2 }
-        ];
+        function updateTimer() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
 
-        // СОСТОЯНИЕ ИГРЫ
-        let state = {
-            name: "",
-            phone: "",
-            company: "",
-            score: 0,
-            currentQ: 0,
-            timer: null,
-            timeLeft: 15,
-            maxTime: 15,
-            docId: null
-        };
-
-        // ПРИВЯЗКА СОБЫТИЙ
-        document.addEventListener('DOMContentLoaded', () => {
-            const startBtn = document.getElementById('start-game-btn');
-            if (startBtn) {
-                startBtn.addEventListener('click', submitRegistration);
-            }
-
-            // Обработчик закрытия попапа
-            const popupCloseBtn = document.getElementById('popup-close-btn');
-            const popupOverlay = document.getElementById('validation-popup');
-            if (popupCloseBtn) {
-                popupCloseBtn.addEventListener('click', () => {
-                    popupOverlay.classList.remove('active');
-                });
-            }
-            // Закрытие при клике вне окна
-            if (popupOverlay) {
-                popupOverlay.addEventListener('click', (e) => {
-                    if (e.target === popupOverlay) {
-                        popupOverlay.classList.remove('active');
-                    }
-                });
-            }
-
-            // --- Инициализация маски для телефона ---
-            const phoneElement = document.getElementById('reg-phone');
-            if (phoneElement && window.IMask) {
-                const maskOptions = {
-                    mask: '+{7} (000) 000-00-00'
-                };
-                window.IMask(phoneElement, maskOptions);
-            }
-        });
-
-        // ЛОГИКА
-        async function submitRegistration() {
-            const name = document.getElementById('reg-name').value.trim();
-            const phone = document.getElementById('reg-phone').value.trim();
-            const company = document.getElementById('reg-company').value.trim();
-
-            // Проверка на заполненность
-            if (!name || !phone) {
-                // Вместо alert показываем попап
-                const popup = document.getElementById('validation-popup');
-                if (popup) popup.classList.add('active');
+            if (distance < 0) {
+                document.getElementById("countdown").innerHTML = "00:00";
                 return;
             }
 
-            // Простая проверка длины телефона (формат +7 (XXX) XXX-XX-XX = 18 символов)
-            if (phone.length < 18) {
-                alert("Пожалуйста, введите корректный номер телефона");
-                return;
-            }
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            state.name = name;
-            state.phone = phone;
-            state.company = company;
-
-            switchScreen('screen-game');
-            loadQuestion();
-
-            // Сохраняем в базу начало игры
-            if (db) {
-                try {
-                    const docRef = await addDoc(collection(db, "quiz_leads"), {
-                        name: state.name,
-                        phone: state.phone,
-                        company: state.company,
-                        score: 0,
-                        date: new Date(),
-                        finished: false
-                    });
-                    state.docId = docRef.id;
-                    console.log("Start saved:", state.docId);
-                } catch (e) {
-                    console.error("Save error:", e);
-                }
-            }
+            document.getElementById("countdown").innerHTML = 
+                (minutes < 10 ? "0" + minutes : minutes) + ":" + 
+                (seconds < 10 ? "0" + seconds : seconds);
         }
 
-        function switchScreen(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        }
+        setInterval(updateTimer, 1000);
+        updateTimer();
 
-        function loadQuestion() {
-            if (state.currentQ >= questions.length) {
-                finishGame();
-                return;
-            }
+        // --- FIREBASE ---
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const listContainer = document.getElementById('leaderboard-list');
 
-            clearInterval(state.timer);
-            state.timeLeft = state.maxTime;
-            updateTimerBar();
-
-            const q = questions[state.currentQ];
-            document.getElementById('question-text').innerText = q.text;
-            document.getElementById('question-counter').innerText = `ВОПРОС ${state.currentQ + 1}/${questions.length}`;
-
-            const container = document.getElementById('answers-container');
-            container.innerHTML = '';
-
-            q.options.forEach((opt, idx) => {
-                const btn = document.createElement('button');
-                btn.className = 'answer-btn';
-                btn.innerText = opt;
-                btn.onclick = () => selectAnswer(idx, btn);
-                container.appendChild(btn);
+        signInAnonymously(auth)
+            .then(() => startListening())
+            .catch((error) => {
+                console.error("Auth Error:", error);
+                startListening();
             });
 
-            startTimer();
-        }
+        function startListening() {
+            const q = query(collection(db, "quiz_leads"), orderBy("score", "desc"), limit(50));
 
-        function startTimer() {
-            state.timer = setInterval(() => {
-                state.timeLeft--;
-                updateTimerBar();
-                if (state.timeLeft <= 0) {
-                    clearInterval(state.timer);
-                    handleTimeOut();
+            onSnapshot(q, (snapshot) => {
+                listContainer.innerHTML = '';
+                
+                if (snapshot.empty) {
+                    listContainer.innerHTML = '<div style="text-align: center; padding: 60px; color: #666; font-size: 18px;">Пока нет результатов</div>';
+                    return;
                 }
-            }, 1000);
+
+                let rank = 1;
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    // Фильтр: показываем только тех, кто закончил (даже если 0 очков)
+                    if (data.finished === true) {
+                        renderRow(rank, data);
+                        rank++;
+                    }
+                });
+            }, (error) => {
+                console.error("Data Error:", error);
+            });
         }
 
-        function updateTimerBar() {
-            const pct = (state.timeLeft / state.maxTime) * 100;
-            const bar = document.getElementById('timer-bar');
-            bar.style.width = pct + '%';
+        function renderRow(rank, data) {
+            const div = document.createElement('div');
+            div.className = 'leader-item';
             
-            // Если мало времени, меняем цвет на красный, иначе зеленый
-            if (pct < 30) {
-                bar.style.backgroundColor = '#ff4757';
-                bar.style.boxShadow = '0 0 10px #ff4757';
-            } else {
-                bar.style.backgroundColor = 'var(--primary-green)';
-                bar.style.boxShadow = '0 0 10px var(--primary-green)';
-            }
-        }
-
-        function handleTimeOut() {
-            const q = questions[state.currentQ];
-            const buttons = document.querySelectorAll('.answer-btn');
-            // Подсветка правильного
-            buttons[q.correct].classList.add('correct');
-            disableButtons();
-            setTimeout(nextQuestion, 1500);
-        }
-
-        function selectAnswer(idx, btn) {
-            clearInterval(state.timer);
-            disableButtons();
-
-            const q = questions[state.currentQ];
-            const isCorrect = (idx === q.correct);
-
-            if (isCorrect) {
-                btn.classList.add('correct');
-                state.score += 100 + (state.timeLeft * 10);
-            } else {
-                btn.classList.add('wrong');
-                document.querySelectorAll('.answer-btn')[q.correct].classList.add('correct');
-            }
-
-            document.getElementById('score-display').innerText = state.score;
-            setTimeout(nextQuestion, 1500);
-        }
-
-        function disableButtons() {
-            document.querySelectorAll('.answer-btn').forEach(b => b.disabled = true);
-        }
-
-        function nextQuestion() {
-            state.currentQ++;
-            loadQuestion();
-        }
-
-        async function finishGame() {
-            switchScreen('screen-result');
-            await saveFinalResult();
-        }
-
-        async function saveFinalResult() {
-            if (!db) return;
-            try {
-                if (state.docId) {
-                    const docRef = doc(db, "quiz_leads", state.docId);
-                    await updateDoc(docRef, {
-                        score: state.score,
-                        finished: true,
-                        date: new Date()
-                    });
-                    console.log("Finished saved");
+            // Маска телефона
+            let maskedPhone = "";
+            if (data.phone) {
+                const digitsOnly = data.phone.replace(/\D/g, ''); 
+                if (digitsOnly.length >= 4) {
+                    const last4 = digitsOnly.slice(-4);
+                    maskedPhone = "..." + last4;
+                } else {
+                    maskedPhone = "..."; 
                 }
-            } catch (e) {
-                console.error("Error saving final:", e);
             }
+
+            div.innerHTML = `
+                <div class="rank">${rank}</div>
+                <div class="name-cell">
+                    <span class="name-text">${escapeHtml(data.name)}</span>
+                </div>
+                <div class="phone">${maskedPhone}</div>
+                <div class="score">${data.score}</div>
+            `;
+            listContainer.appendChild(div);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return "";
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
         }
     </script>
 </body>
