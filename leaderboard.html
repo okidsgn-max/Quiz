@@ -25,7 +25,6 @@
         body {
             font-family: 'Open Sans', 'SB Sans', Arial, sans-serif;
             background-color: var(--bg-dark);
-            /* Градиент как в основном квизе */
             background: radial-gradient(circle at 50% -10%, #1a5548 0%, #000000 60%);
             color: var(--text-color);
             height: 100vh;
@@ -35,7 +34,8 @@
             align-items: center;
         }
 
-        /* Основная сетка: Слева (1 часть) | Справа (1.6 части) */
+        /* --- ОСНОВНАЯ СЕТКА --- */
+        /* Слева (Таймер/QR) | Справа (Таблица) */
         .main-grid {
             display: grid;
             grid-template-columns: 1fr 1.6fr; 
@@ -46,7 +46,7 @@
             padding: 40px 60px;
         }
 
-        /* --- ЛЕВАЯ КОЛОНКА (Таймер, QR) --- */
+        /* --- ЛЕВАЯ КОЛОНКА --- */
         .left-panel {
             display: flex;
             flex-direction: column;
@@ -54,7 +54,7 @@
             align-items: center;
             text-align: center;
             padding: 20px 0;
-            /* Левая панель прозрачная, блоки внутри неё имеют стиль */
+            /* Сама панель прозрачная, блоки внутри (QR, Таймер) - стекло */
         }
 
         .cta-block {
@@ -99,17 +99,18 @@
         }
 
         .qr-code {
-            width: 320px;
-            height: 320px;
+            width: 300px; /* Оптимальный размер */
+            height: 300px;
             border-radius: 12px;
             object-fit: contain;
             display: block;
+            background: white; /* Фон для прозрачных QR */
         }
 
-        /* Заглушка */
+        /* Заглушка, если нет картинки */
         .qr-placeholder {
-            width: 320px;
-            height: 320px;
+            width: 300px;
+            height: 300px;
             background: white;
             border-radius: 12px;
             display: flex;
@@ -136,6 +137,8 @@
             color: #aaa;
             margin-bottom: 5px;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .timer-value {
@@ -181,7 +184,7 @@
             box-shadow: 0 0 15px var(--primary-green);
         }
 
-        /* Заголовки таблицы */
+        /* Шапка таблицы */
         .table-header {
             display: grid;
             grid-template-columns: 70px 1fr 180px 120px; /* # | Имя | Тел | Очки */
@@ -204,7 +207,7 @@
         #leaderboard-list::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 3px; }
         #leaderboard-list::-webkit-scrollbar-thumb { background: var(--primary-green); border-radius: 3px; }
 
-        /* Элемент списка */
+        /* Строка участника */
         .leader-item {
             display: grid;
             grid-template-columns: 70px 1fr 180px 120px;
@@ -223,7 +226,7 @@
             background: rgba(255, 255, 255, 0.06);
         }
 
-        /* Топ 3 */
+        /* Стиль Топ-3 */
         .leader-item:nth-child(1) { 
             background: linear-gradient(90deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05)); 
             border: 1px solid rgba(255, 215, 0, 0.3);
@@ -242,8 +245,6 @@
             font-weight: 700; 
             font-size: 16px;
         }
-        
-        /* Особый стиль для номера места в топ-3 */
         .leader-item:nth-child(1) .rank { color: #FFD700; }
         .leader-item:nth-child(2) .rank { color: #C0C0C0; }
         .leader-item:nth-child(3) .rank { color: #CD7F32; }
@@ -280,11 +281,13 @@
             to { opacity: 1; transform: translateX(0); }
         }
         
-        @media (max-width: 1200px) {
+        /* Адаптив: только на экранах уже 900px переключаемся в столбик */
+        @media (max-width: 900px) {
             .main-grid {
                 grid-template-columns: 1fr;
                 height: auto;
                 overflow-y: auto;
+                padding: 20px;
             }
             body { overflow: auto; }
             .left-panel, .right-panel { width: 100%; margin-bottom: 20px; }
@@ -309,7 +312,7 @@
 
             <div class="qr-container">
                 <div class="qr-frame">
-                    <!-- ЗАМЕНИТЕ src="qr.png" НА ВАШ ФАЙЛ -->
+                    <!-- QR КОД (qr.png) -->
                     <img src="qr.png" alt="QR Code" class="qr-code" onerror="this.style.display='none'; document.getElementById('qr-stub').style.display='flex'">
                     
                     <!-- Заглушка -->
@@ -363,8 +366,6 @@
         };
 
         // --- ТАЙМЕР (2 минуты) ---
-        // Примечание: Для реального события лучше задать фиксированную дату, например:
-        // const targetDate = new Date("2023-12-31T20:00:00");
         const targetDate = new Date();
         targetDate.setMinutes(targetDate.getMinutes() + 2); 
 
@@ -415,7 +416,7 @@
                 let rank = 1;
                 snapshot.forEach((doc) => {
                     const data = doc.data();
-                    // Фильтр: только если игра закончена (даже с 0 очков)
+                    // Фильтр: показываем только тех, кто закончил (даже если 0 очков)
                     if (data.finished === true) {
                         renderRow(rank, data);
                         rank++;
@@ -430,13 +431,13 @@
             const div = document.createElement('div');
             div.className = 'leader-item';
             
-            // Маска телефона (последние 4 цифры)
+            // Маска телефона
             let maskedPhone = "";
             if (data.phone) {
                 const digitsOnly = data.phone.replace(/\D/g, ''); 
                 if (digitsOnly.length >= 4) {
                     const last4 = digitsOnly.slice(-4);
-                    maskedPhone = "..." + last4; // Заменили звездочки на троеточие для чистоты
+                    maskedPhone = "..." + last4;
                 } else {
                     maskedPhone = "..."; 
                 }
